@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop" 
+    xmlns:tx="http://www.springframework.org/schema/tx" 
+    xmlns:context="http://www.springframework.org/schema/context" 
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+        
+      <!-- Configure transaction management -->
+    	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    		<property name="dataSource" ref="dataSource" />
+    	</bean>
+    	
+    	<!-- Pointcut expression -->
+    	<aop:config>
+		<aop:pointcut id="transactionPointcut" expression="execution(* shougang.guigang.safety.sso.service..*.*(..))"/>
+		<aop:advisor advice-ref="transactionAdvice" pointcut-ref="transactionPointcut"/>
+		</aop:config>
+	
+		<tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+			<tx:attributes>
+			<!-- 
+				REQUIRED:Its running needs a container.When it is running,if in a transaction,joins in the transaction,if not,new a transaction.
+				NOT_SUPPORTED:Don't need a transactional.If it isn't associated with a transaction,container doesn't create a transaction for it.
+								If it is invoked in a transaction,this transaction is suspended until it calls the end.
+				REQUIRESNEW:Whether or not there is a transaction,new a transaction.If it is in a transaction,this transaction is suspended until
+							it calls the end.
+				MANDATORY:It only executes in a transaction and can not initiate a transaction.If not in a transaction,throw a exception.
+				SUPPORTS:If it runs in a transaction,uses this transaction.If not,don't use a transaction.
+				NEVER:It cannot run in a transaction.
+				NESTED:If there is a transaction,it runs in a nested transaction.If not,according to "REQUIRED".It uses a alone transaction and has several saving points.
+						The rolling back of an internal transaction does not affect the rolling back of the external transaction.It only works for "DataSourceTransactionManager"!
+			 -->
+				<tx:method name="add*" propagation="REQUIRED"/>
+				<tx:method name="save*" propagation="REQUIRED"/>
+				<tx:method name="create*" propagation="REQUIRED"/>
+				<tx:method name="delete*" propagation="REQUIRED"/>
+				<tx:method name="remove*" propagation="REQUIRED"/>
+				<tx:method name="update*" propagation="REQUIRED"/>
+				<tx:method name="modify*" propagation="REQUIRED"/>
+				<tx:method name="edit*" propagation="REQUIRED"/>
+				<tx:method name="execute*" propagation="REQUIRED"/>
+				<tx:method name="repair" propagation="REQUIRED"/>
+				<tx:method name="deleteAndRepair" propagation="REQUIRED"/>
+				<tx:method name="login*" propagation="REQUIRED"/>
+				<tx:method name="datagrid*" propagation="REQUIRED"/>
+				<tx:method name="load*" propagation="REQUIRED"/>
+				<tx:method name="insert*" propagation="REQUIRED"/>
+				
+				<tx:method name="select*" propagation="SUPPORTS" read-only="true"/>
+				<tx:method name="search*" propagation="SUPPORTS" read-only="true"/>
+				<tx:method name="find*" propagation="SUPPORTS" read-only="true"/>
+				<tx:method name="get*" propagation="SUPPORTS" read-only="true"/>
+				<tx:method name="count*" propagation="SUPPORTS" read-only="true"/>
+				<tx:method name="*" propagation="SUPPORTS"/>
+			</tx:attributes>
+		</tx:advice>
+		
+	</beans>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop" 
+    xmlns:tx="http://www.springframework.org/schema/tx" 
+    xmlns:context="http://www.springframework.org/schema/context" 
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+        
+        <!-- database connect pool -->
+        <!-- load configuration -->
+		<context:property-placeholder location="classpath:properties/*.properties"/> 
+		
+    	<!-- druid configures datasource -->
+    	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+    		<property name="url" value="${jdbc_url}"/>
+    		<property name="username" value="${jdbc_username}"/>
+    		<property name="password" value="${jdbc_password}"/>
+    		
+    		<!-- initial connection size -->
+    		<property name="initialSize" value="0"/>
+    		
+    		<!-- connection pool maximum number of connections used  -->
+    		<property name="maxActive" value="20"/>
+    		
+    		<!-- connection pool minimum idle -->
+    		<property name="minIdle" value="0"/>
+    		
+    		<!-- gets the maximum connection waiting time -->
+    		<property name="maxWait" value="60000"/>
+    		
+    		<property name="poolPreparedStatements" value="true"/>
+    		
+    		<property name="validationQuery" value="${validationQuery}"/>
+    		<property name="testOnBorrow" value="false"/>
+    		<property name="testOnReturn" value="false"/>
+    		<property name="testWhileIdle" value="true"/>
+    		
+    		<!-- How long is the configuration interval before testing,detects the need to close the free conncetion,milliseconds -->
+    		<property name="timeBetweenEvictionRunsMillis" value="60000"/>
+    		
+    		<!-- configure a minimum lifetime to connect to the pool,milliseconds -->
+    		<property name="minEvictableIdleTimeMillis" value="25200000"/>
+    		
+    		<!-- open the removeAbandoned function -->
+    		<property name="removeAbandoned" value="true"/>
+    		
+    		<property name="removeAbandonedTimeout" value="1800"/>
+    		
+    		<!-- monitor database -->
+    		<property name="filters" value="mergeStat"/>
+    		
+    	</bean>
+    	
+    	<!-- Integrated MyBatis ,let spring manage sqlSessionFactory-->
+    	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    	
+    		<!-- database connect poll -->
+    		<property name="dataSource" ref="dataSource" />
+    		
+    		<!-- load Mybatis overall situation configuration -->
+    		<property name="configLocation" value="classpath:mytatis/sqlMapConfig.xml" />
+    	</bean>
+    	
+    	<!-- Configure scanner -->
+    	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+    		<property name="basePackage" value="shougang.guigang.safety.mapper" />
+    	</bean>
+    	
+    	<!-- Configure a sqlSession that can execute batch operator -->
+    	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+    		<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"/>
+    		<constructor-arg name="executorType" value="BATCH"/>
+    	</bean>
+    	
+	</beans>
